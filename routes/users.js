@@ -1,10 +1,20 @@
 const express = require('express');
 const router = express.Router();
 const { User } = require("../models/User");
-
+const moment = require('moment');
 const { auth } = require("../middleware/auth");
 
-router.get("/auth", auth, (req, res) => {
+router.get("/auth", auth, async (req, res) => {
+    var addOneHour = moment(new Date()).add(1, "hour");
+    const update = {
+        tokenExp : addOneHour.valueOf()
+    }
+
+    await User.findOneAndUpdate({"_id": req.user._id}, update, {new: true}).exec()
+    .then((doc) => {
+        console.log('Token Expired time extended', moment(doc.tokenExp).format());
+    })
+
     res.status(200).json({
         _id: req.user._id,
         isAdmin: req.user.role === 0 ? false : true,
@@ -14,6 +24,8 @@ router.get("/auth", auth, (req, res) => {
         lastname: req.user.lastname,
         role: req.user.role,
         image: req.user.image,
+        token : req.user.token,
+        tokenExp : req.user.tokenExp
     });
 });
 
@@ -48,7 +60,9 @@ router.post("/login", (req, res) => {
                     .cookie("w_auth", user.token)
                     .status(200)
                     .json({
-                        loginSuccess: true, userId: user._id
+                        loginSuccess: true, userId: user._id,
+                        tokenExp : user.tokenExp,
+                        token : user.token
                     });
             });
         });

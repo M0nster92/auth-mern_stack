@@ -12,6 +12,7 @@ let auth = (req, res, next) => {
       });
 
     req.token = token;
+    req.toeknExp = user.toeknExp
     req.user = user;
     next();
   });
