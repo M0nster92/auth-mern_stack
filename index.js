@@ -10,7 +10,7 @@ const connect = mongoose.connect
     useNewUrlParser: true, useUnifiedTopology: true,
     useCreateIndex: true, useFindAndModify: false
 })
-.then(() => console.log('Database Connected...'))
+.then(() => console.log('Database Connected.....'))
 .catch(err => console.log(err));
 
 app.use(cors());
